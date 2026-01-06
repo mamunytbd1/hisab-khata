@@ -1,0 +1,9 @@
+{
+  "name": "Hisab Khata",
+  "short_name": "Hisab",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b5fff",
+  "theme_color": "#0b5fff",
+  "icons": []
+}
