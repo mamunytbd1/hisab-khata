@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>হিসাব খাতা</title>
+  <style>
+    :root { --r:18px; }
+    body{font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; background:#f6f7fb; color:#111;}
+    header{padding:16px; background:#0b5fff; color:#fff;}
+    header h1{margin:0; font-size:20px; font-weight:900;}
+    header p{margin:6px 0 0; opacity:.9; font-size:13px;}
+    .wrap{padding:14px; max-width:720px; margin:0 auto;}
+    .card{background:#fff; border:1px solid #e7e7ee; border-radius:var(--r); padding:14px; box-shadow:0 10px 24px rgba(0,0,0,.06);}
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+    .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+    label{font-size:12px; color:#444; font-weight:700; display:block; margin:8px 0 6px;}
+    input, select, textarea{
+      width:100%; padding:12px; border-radius:14px; border:1px solid #dfe1ea; outline:none; font-size:14px; background:#fff;
+    }
+    textarea{min-height:44px; resize:vertical;}
+    button{
+      border:none; border-radius:14px; padding:12px 14px; font-weight:800; cursor:pointer;
+    }
+    .btn{background:#0b5fff; color:#fff;}
+    .btn2{background:#111; color:#fff;}
+    .btn3{background:#fff; border:1px solid #dfe1ea;}
+    .row{display:flex; gap:10px; align-items:center;}
+    .row > * {flex:1;}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:999px; border:1px solid #e7e7ee; background:#fff;}
+    .stat{display:flex; flex-direction:column; gap:4px;}
+    .stat b{font-size:16px;}
+    .stat span{font-size:12px; color:#666;}
+    .list{margin-top:12px;}
+    .item{display:flex; gap:10px; align-items:flex-start; padding:12px; border-radius:16px; border:1px solid #eee; background:#fff;}
+    .badge{min-width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:14px; font-weight:900;}
+    .inc{background:#e8f3ff; color:#0b5fff;}
+    .exp{background:#ffecec; color:#c1121f;}
+    .meta{flex:1;}
+    .meta .top{display:flex; justify-content:space-between; gap:10px;}
+    .meta .top b{font-size:15px;}
+    .meta .top small{color:#666;}
+    .meta p{margin:6px 0 0; color:#555; font-size:13px;}
+    .actions{display:flex; gap:8px;}
+    .muted{color:#666; font-size:12px;}
+    .hr{height:1px; background:#eee; margin:14px 0;}
+    .sticky{position:sticky; top:10px; z-index:5;}
+  </style>
+</head>
+<body>
+<header>
+  <h1>হিসাব খাতা</h1>
+  <p>আয়-ব্যয় লিখে রাখো • অফলাইনে কাজ করে • ডাটা ফোনেই সেভ থাকে</p>
+</header>
+
+<div class="wrap">
+
+  <div class="card sticky">
+    <div class="grid3">
+      <div class="pill stat"><span>মোট আয়</span><b id="sumIncome">৳0</b></div>
+      <div class="pill stat"><span>মোট ব্যয়</span><b id="sumExpense">৳0</b></div>
+      <div class="pill stat"><span>ব্যালান্স</span><b id="sumBalance">৳0</b></div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="grid">
+      <div>
+        <label>টাইপ</label>
+        <select id="type">
+          <option value="income">আয়</option>
+          <option value="expense">ব্যয়</option>
+        </select>
+      </div>
+      <div>
+        <label>টাকা (Amount)</label>
+        <input id="amount" type="number" inputmode="numeric" placeholder="যেমন: 500" />
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>তারিখ</label>
+        <input id="date" type="date" />
+      </div>
+      <div>
+        <label>ক্যাটাগরি</label>
+        <input id="category" type="text" placeholder="যেমন: বেতন / খাবার / ভাড়া" />
+      </div>
+    </div>
+
+    <label>নোট (Optional)</label>
+    <textarea id="note" placeholder="যেমন: জানুয়ারি ভাড়া"></textarea>
+
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="addBtn">যোগ করো</button>
+      <button class="btn3" id="resetBtn" title="ফর্ম খালি করবে">রিসেট</button>
+      <button class="btn2" id="exportBtn" title="CSV ডাউনলোড">Export CSV</button>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="grid">
+      <div>
+        <label>সার্চ</label>
+        <input id="search" type="text" placeholder="ক্যাটাগরি/নোট/টাকা" />
+      </div>
+      <div>
+        <label>ফিল্টার</label>
+        <select id="filter">
+          <option value="all">সব</option>
+          <option value="income">শুধু আয়</option>
+          <option value="expense">শুধু ব্যয়</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+      <button class="btn3" id="clearBtn">সব ডাটা মুছো</button>
+      <span class="muted" id="countTxt" style="text-align:right;"></span>
+    </div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div style="height:18px;"></div>
+  <div class="muted">
+    টিপস: এটা ফোনেই কাজ করে। APK বানাতে চাইলে পরে Cordova/Capacitor দিয়ে র‍্যাপ করা যাবে।
+  </div>
+</div>
+
+<script>
+  const KEY = "hisab_khata_v1";
+
+  /** @type {{id:string,type:'income'|'expense',amount:number,date:string,category:string,note:string,ts:number}[]} */
+  let items = [];
+
+  const el = (id) => document.getElementById(id);
+  const fmt = (n) => "৳" + (Number(n || 0)).toLocaleString("en-US");
+
+  function todayISO(){
+    const d = new Date();
+    const tzOff = d.getTimezoneOffset() * 60000;
+    return new Date(d - tzOff).toISOString().slice(0,10);
+  }
+
+  function load(){
+    try {
+      items = JSON.parse(localStorage.getItem(KEY) || "[]");
+      if (!Array.isArray(items)) items = [];
+    } catch { items = []; }
+  }
+
+  function save(){
+    localStorage.setItem(KEY, JSON.stringify(items));
+  }
+
+  function recalc(){
+    const income = items.filter(x=>x.type==="income").reduce((a,b)=>a+b.amount,0);
+    const expense = items.filter(x=>x.type==="expense").reduce((a,b)=>a+b.amount,0);
+    el("sumIncome").textContent = fmt(income);
+    el("sumExpense").textContent = fmt(expense);
+    el("sumBalance").textContent = fmt(income - expense);
+  }
+
+  function matchesSearch(x, q){
+    if(!q) return true;
+    q = q.toLowerCase();
+    return (
+      String(x.amount).includes(q) ||
+      (x.category || "").toLowerCase().includes(q) ||
+      (x.note || "").toLowerCase().includes(q) ||
+      (x.date || "").includes(q)
+    );
+  }
+
+  function render(){
+    const q = el("search").value.trim();
+    const f = el("filter").value;
+
+    const filtered = items
+      .slice()
+      .sort((a,b)=>b.ts - a.ts)
+      .filter(x => (f==="all" ? true : x.type===f))
+      .filter(x => matchesSearch(x, q));
+
+    el("countTxt").textContent = `এন্ট্রি: ${filtered.length} / ${items.length}`;
+
+    const root = el("list");
+    root.innerHTML = "";
+
+    if(filtered.length === 0){
+      const empty = document.createElement("div");
+      empty.className = "card";
+      empty.innerHTML = `<b>কোনো ডাটা নেই</b><p class="muted">উপরে ফর্ম পূরণ করে আয়/ব্যয় যোগ করো।</p>`;
+      root.appendChild(empty);
+      return;
+    }
+
+    for(const x of filtered){
+      const div = document.createElement("div");
+      div.className = "item";
+      const badgeClass = x.type==="income" ? "badge inc" : "badge exp";
+      const badgeTxt = x.type==="income" ? "আয়" : "ব্যয়";
+
+      div.innerHTML = `
+        <div class="${badgeClass}">${badgeTxt}</div>
+        <div class="meta">
+          <div class="top">
+            <b>${escapeHtml(x.category || "(ক্যাটাগরি নেই)")}</b>
+            <small>${escapeHtml(x.date || "")}</small>
+          </div>
+          <p>${escapeHtml(x.note || "")}</p>
+          <div class="row" style="margin-top:10px;">
+            <div><b>${fmt(x.amount)}</b></div>
+            <div class="actions" style="justify-content:flex-end;">
+              <button class="btn3" data-act="edit" data-id="${x.id}">Edit</button>
+              <button class="btn3" data-act="del" data-id="${x.id}">Delete</button>
+            </div>
+          </div>
+        </div>
+      `;
+      root.appendChild(div);
+    }
+
+    root.querySelectorAll("button[data-act]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const act = btn.getAttribute("data-act");
+        const id = btn.getAttribute("data-id");
+        if(act==="del") delItem(id);
+        if(act==="edit") editItem(id);
+      });
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+
+  function addItem(){
+    const type = el("type").value;
+    const amount = Number(el("amount").value);
+    const date = el("date").value;
+    const category = el("category").value.trim();
+    const note = el("note").value.trim();
+
+    if(!amount || amount <= 0){ alert("টাকার পরিমাণ ঠিক করে দাও"); return; }
+    if(!date){ alert("তারিখ সিলেক্ট করো"); return; }
+
+    const id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+    items.push({ id, type, amount, date, category, note, ts: Date.now() });
+    save(); recalc(); render();
+    resetForm();
+  }
+
+  function resetForm(){
+    el("type").value = "income";
+    el("amount").value = "";
+    el("date").value = todayISO();
+    el("category").value = "";
+    el("note").value = "";
+  }
+
+  function delItem(id){
+    if(!confirm("ডিলিট করতে চান?")) return;
+    items = items.filter(x=>x.id !== id);
+    save(); recalc(); render();
+  }
+
+  function editItem(id){
+    const x = items.find(i=>i.id===id);
+    if(!x) return;
+
+    const newAmount = prompt("Amount", String(x.amount));
+    if(newAmount === null) return;
+    const amount = Number(newAmount);
+    if(!amount || amount <= 0){ alert("Amount ঠিক নয়"); return; }
+
+    const newCat = prompt("Category", x.category || "");
+    if(newCat === null) return;
+
+    const newNote = prompt("Note", x.note || "");
+    if(newNote === null) return;
+
+    const newDate = prompt("Date (YYYY-MM-DD)", x.date || "");
+    if(newDate === null) return;
+
+    x.amount = amount;
+    x.category = (newCat || "").trim();
+    x.note = (newNote || "").trim();
+    x.date = (newDate || "").trim();
+    x.ts = Date.now();
+
+    save(); recalc(); render();
+  }
+
+  function clearAll(){
+    if(!confirm("সব ডাটা মুছে যাবে। নিশ্চিত?")) return;
+    items = [];
+    save(); recalc(); render();
+  }
+
+  function exportCSV(){
+    const rows = [
+      ["type","amount","date","category","note"]
+    ].concat(items.map(x => [x.type, x.amount, x.date, x.category, x.note]));
+
+    const csv = rows.map(r => r.map(v => `"${String(v ?? "").replaceAll('"','""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "hisab_khata.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // init
+  load();
+  el("date").value = todayISO();
+  recalc();
+  render();
+
+  el("addBtn").addEventListener("click", addItem);
+  el("resetBtn").addEventListener("click", resetForm);
+  el("clearBtn").addEventListener("click", clearAll);
+  el("exportBtn").addEventListener("click", exportCSV);
+
+  el("search").addEventListener("input", render);
+  el("filter").addEventListener("change", render);
+</script>
+</body>
+</html>
